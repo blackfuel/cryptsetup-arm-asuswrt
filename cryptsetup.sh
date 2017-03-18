@@ -1,4 +1,7 @@
 #!/bin/bash
+# Before running this script, you must first compile your router firmware so
+# that it generates the AsusWRT libraries.  If you "make clean" this will
+# remove the libraries needed by this script.
 PATH_CMD="$(readlink -f $0)"
 
 set -e
