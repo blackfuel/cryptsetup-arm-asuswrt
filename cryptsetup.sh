@@ -1,7 +1,14 @@
 #!/bin/bash
+#############################################################################
+# Cryptsetup for AsusWRT
+#
+# This script downloads and compiles all packages needed for adding 
+# dm-crypt + LUKS + Veracrypt/Truecrypt device encryption to Asus ARM routers.
+#
 # Before running this script, you must first compile your router firmware so
-# that it generates the AsusWRT libraries.  If you "make clean" this will
+# that it generates the AsusWRT libraries.  Do not "make clean" as this will
 # remove the libraries needed by this script.
+#############################################################################
 PATH_CMD="$(readlink -f $0)"
 
 set -e
@@ -10,9 +17,9 @@ set -x
 REBUILD_ALL=1
 PACKAGE_ROOT="$HOME/asuswrt-merlin-addon/cryptsetup"
 SRC="$PACKAGE_ROOT/src"
-TOP="$HOME/asuswrt-merlin/release/src/router"
-SYSROOT="$HOME/asuswrt-merlin/release/src-rt-6.x.4708/toolchains/hndtools-arm-linux-2.6.36-uclibc-4.5.3/arm-brcm-linux-uclibcgnueabi/sysroot"
-LINUX_KERNEL="$HOME/asuswrt-merlin/release/src-rt-6.x.4708/linux/linux-2.6.36" \
+ASUSWRT_MERLIN="$HOME/asuswrt-merlin"
+TOP="$ASUSWRT_MERLIN/release/src/router"
+SYSROOT="$ASUSWRT_MERLIN/release/src-rt-6.x.4708/toolchains/hndtools-arm-linux-2.6.36-uclibc-4.5.3/arm-brcm-linux-uclibcgnueabi/sysroot"
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/brcm-arm/bin:/opt/brcm/hndtools-mipsel-linux/bin:/opt/brcm/hndtools-mipsel-uclibc/bin
 MAKE="make -j`nproc`"
 
@@ -215,13 +222,18 @@ if [ ! -f "$FOLDER/__package_installed" ]; then
 cd $FOLDER
 
 # compiling without "--disable-kernel-crypto" requires a kernel header file: linux/if_alg.h
-HEADER_KERNEL_CRYPTO="${PATH_CMD%/*}/if_alg.h"
-[ ! -f "$LINUX_KERNEL/include/linux/if_alg.h" ] && [ -f "$HEADER_KERNEL_CRYPTO" ] && cp -p "$HEADER_KERNEL_CRYPTO" $LINUX_KERNEL/include/linux
+IF_ALG_H="${PATH_CMD%/*}/if_alg.h"
+PACKAGE_ROOT_IF_ALG_H="$PACKAGE_ROOT/include/linux/if_alg.h"
+if [ ! -f "$PACKAGE_ROOT_IF_ALG_H" ] && [ -f "$IF_ALG_H" ]; then
+  PACKAGE_ROOT_INCLUDE_LINUX="${PACKAGE_ROOT_IF_ALG_H%/*}"
+  mkdir -p "$PACKAGE_ROOT_INCLUDE_LINUX"
+  cp -p "$IF_ALG_H" "$PACKAGE_ROOT_INCLUDE_LINUX"
+fi
 
 if [ "$CRYPTO_BACKEND" == "gcrypt" ]; then
 
 PKG_CONFIG_PATH="$PACKAGE_ROOT/lib/pkgconfig" \
-OPTS="-ffunction-sections -fdata-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99 -I$PACKAGE_ROOT/include -I$TOP/e2fsprogs/lib -I$LINUX_KERNEL/include" \
+OPTS="-ffunction-sections -fdata-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99 -I$PACKAGE_ROOT/include -I$TOP/e2fsprogs/lib" \
 CFLAGS="$OPTS" CPPFLAGS="$OPTS" \
 LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -L$PACKAGE_ROOT/lib -L$TOP/e2fsprogs/lib" \
 LIBS="-lpthread -lgpg-error -luuid -ldl -lgcrypt -L$PACKAGE_ROOT/lib -L$TOP/e2fsprogs/lib" \
@@ -241,7 +253,7 @@ LIBS="-lpthread -lgpg-error -luuid -ldl -lgcrypt -L$PACKAGE_ROOT/lib -L$TOP/e2fs
 elif [ "$CRYPTO_BACKEND" == "openssl_asuswrt" ]; then
 
 PKG_CONFIG_PATH="$PACKAGE_ROOT/lib/pkgconfig" \
-OPTS="-ffunction-sections -fdata-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99 -I$PACKAGE_ROOT/include -I$TOP/e2fsprogs/lib -I$LINUX_KERNEL/include" \
+OPTS="-ffunction-sections -fdata-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99 -I$PACKAGE_ROOT/include -I$TOP/e2fsprogs/lib" \
 CFLAGS="$OPTS" CPPFLAGS="$OPTS" \
 LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -L$PACKAGE_ROOT/lib -L$TOP/e2fsprogs/lib" \
 LIBS="-lpthread -lssl -lcrypto -lz -luuid -ldl -L$TOP/e2fsprogs/lib" \
@@ -260,7 +272,7 @@ LIBS="-lpthread -lssl -lcrypto -lz -luuid -ldl -L$TOP/e2fsprogs/lib" \
 elif [ "$CRYPTO_BACKEND" == "nettle_asuswrt" ]; then
 
 PKG_CONFIG_PATH="$PACKAGE_ROOT/lib/pkgconfig" \
-OPTS="-ffunction-sections -fdata-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99 -I$PACKAGE_ROOT/include -I$TOP/e2fsprogs/lib -I$TOP/nettle/include -I$LINUX_KERNEL/include" \
+OPTS="-ffunction-sections -fdata-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99 -I$PACKAGE_ROOT/include -I$TOP/e2fsprogs/lib -I$TOP/nettle/include" \
 CFLAGS="$OPTS" CPPFLAGS="$OPTS" \
 LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -L$PACKAGE_ROOT/lib -L$TOP/e2fsprogs/lib -L$TOP/nettle/lib" \
 LIBS="-lpthread -lgpg-error -luuid -ldl -lnettle -L$PACKAGE_ROOT/lib -L$TOP/e2fsprogs/lib -L$TOP/nettle/lib" \
