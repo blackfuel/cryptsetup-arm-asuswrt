@@ -25,7 +25,7 @@ cd ~/cryptsetup-arm-asuswrt
 ./cryptsetup.sh
 ```
 
-### Example: An encrypted file container, created on Microsoft Windows using Veracrypt, may now be used on the router.
+### Example: An encrypted file container, created on Microsoft Windows using Veracrypt, may now be opened on your Asus ARM router.
 ```
 # first, use Veracrypt to create an encrypted file container named "vctest.img"
 # then copy it to the router and run this script
