@@ -4,7 +4,7 @@ It's possible to mount a Veracrypt or Truecrypt formatted device on your Asus AR
 
 The `cryptsetup` program must also be compiled without `--disable-kernel_crypto`.  I found that the choice of crypto backend, for `cryptsetup`, makes a very big difference in the time to unlock a file container or device.  *Nettle* seems to be the fastest at 90 seconds on my RT-AC68U overclocked to 1200 MHz.  The crypto backends *gcrypt* and *openssl* take more than 4 minutes each.  And, still trying to get the *kernel* crypto backend to work.
 
-### Clone the project and let's get begin.
+### Clone the project and let's begin.
 ```
 cd
 git clone https://github.com/blackfuel/cryptsetup-arm-asuswrt.git
