@@ -11,7 +11,7 @@ git clone https://github.com/blackfuel/cryptsetup-arm-asuswrt.git
 cd cryptsetup-arm-asuswrt
 ```
 
-### HOWTO: Patch AsusWRT kernel to enable dm-crypt, hashes, ciphers, and the user-space socket interface to the kernel symmetric key cipher algorithms for Veracrypt/Truecrypt support
+### HOWTO: Patch AsusWRT kernel to enable dm-crypt, hashes, ciphers, and the user-space socket interface to the algorithms for symmetric key cipher
 ```
 cd ~/asuswrt-merlin
 patch -p2 -i ~/cryptsetup-arm-asuswrt/asuswrt_arm_dm-crypt+skcipher.patch
