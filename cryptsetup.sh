@@ -21,7 +21,8 @@ ASUSWRT_MERLIN="$HOME/asuswrt-merlin"
 TOP="$ASUSWRT_MERLIN/release/src/router"
 SYSROOT="$ASUSWRT_MERLIN/release/src-rt-6.x.4708/toolchains/hndtools-arm-linux-2.6.36-uclibc-4.5.3/arm-brcm-linux-uclibcgnueabi/sysroot"
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/brcm-arm/bin:/opt/brcm/hndtools-mipsel-linux/bin:/opt/brcm/hndtools-mipsel-uclibc/bin
-MAKE="make -j`nproc`"
+#MAKE="make -j`nproc`"
+MAKE="make -j1"
 
 ######## ####################################################################
 # POPT # ####################################################################
@@ -111,10 +112,10 @@ cd $TOP/ncurses/lib
 popd
 
 PKG_CONFIG_PATH="$PACKAGE_ROOT/lib/pkgconfig" \
-OPTS="-ffunction-sections -fno-data-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99 -I$SYSROOT/usr/include -lm" \
+OPTS="-ffunction-sections -fno-data-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99 -I$TOP/ncurses/include -I$SYSROOT/usr/include -lm" \
 CFLAGS="$OPTS" CPPFLAGS="$OPTS" \
-LDFLAGS="-ffunction-sections -fno-data-sections -Wl,--gc-sections -L$SYSROOT/usr/lib" \
-LIBS="-lm -L$SYSROOT/usr/lib" \
+LDFLAGS="-ffunction-sections -fno-data-sections -Wl,--gc-sections -L$TOP/ncurses/lib -L$SYSROOT/usr/lib" \
+LIBS="-lm -lncursesw -L$TOP/ncurses/lib -L$SYSROOT/usr/lib" \
 ./configure \
 --host=arm-brcm-linux-uclibcgnueabi \
 '--build=' \
@@ -208,21 +209,25 @@ fi
 # CRYPTSETUP # ##############################################################
 ############## ##############################################################
 
-# select the crypto backend for cryptsetup
-#CRYPTO_BACKEND="gcrypt"
-#CRYPTO_BACKEND="openssl_asuswrt"
-#CRYPTO_BACKEND="nettle_asuswrt"
-CRYPTO_BACKEND="kernel"
+if [ -z "$CRYPTO_BACKEND" ]; then
+  # select the crypto backend for cryptsetup
+  #CRYPTO_BACKEND="gcrypt"
+  #CRYPTO_BACKEND="openssl"
+  #CRYPTO_BACKEND="nettle"
+  CRYPTO_BACKEND="kernel"
+fi
 
-mkdir -p $SRC/cryptsetup && cd $SRC/cryptsetup
+mkdir -p "$SRC/cryptsetup" && cd "$SRC/cryptsetup"
 DL="cryptsetup-1.7.4.tar.xz"
 FOLDER="${DL%.tar.xz*}"
+FOLDER_CRYPTO="${FOLDER}-${CRYPTO_BACKEND}"
 URL="https://www.kernel.org/pub/linux/utils/cryptsetup/v1.7/$DL"
-[ "$REBUILD_ALL" == "1" ] && rm -rf "$FOLDER"
-if [ ! -f "$FOLDER/__package_installed" ]; then
+[ "$REBUILD_ALL" == "1" ] && rm -rf "$FOLDER_CRYPTO"
+if [ ! -f "$FOLDER_CRYPTO/__package_installed" ]; then
 [ ! -f "$DL" ] && wget $URL
-[ ! -d "$FOLDER" ] && tar xvJf $DL
-cd $FOLDER
+[ -d "$FOLDER" ] && rm -rf $FOLDER
+[ ! -d "$FOLDER_CRYPTO" ] && tar xvJf $DL && mv $FOLDER $FOLDER_CRYPTO
+cd $FOLDER_CRYPTO
 
 # compiling without "--disable-kernel-crypto" requires a kernel header file: linux/if_alg.h
 IF_ALG_H="${PATH_CMD%/*}/if_alg.h"
@@ -253,7 +258,7 @@ LIBS="-lpthread -lgpg-error -luuid -ldl -lgcrypt -L$PACKAGE_ROOT/lib -L$TOP/e2fs
 --enable-static-cryptsetup \
 --with-libgcrypt-prefix=$PACKAGE_ROOT
 
-elif [ "$CRYPTO_BACKEND" == "openssl_asuswrt" ]; then
+elif [ "$CRYPTO_BACKEND" == "openssl" ]; then
 
 PKG_CONFIG_PATH="$PACKAGE_ROOT/lib/pkgconfig" \
 OPTS="-ffunction-sections -fdata-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99 -I$PACKAGE_ROOT/include -I$TOP/e2fsprogs/lib" \
@@ -272,7 +277,7 @@ LIBS="-lpthread -lssl -lcrypto -lz -luuid -ldl -L$TOP/e2fsprogs/lib" \
 --with-crypto_backend=openssl \
 --enable-static-cryptsetup
 
-elif [ "$CRYPTO_BACKEND" == "nettle_asuswrt" ]; then
+elif [ "$CRYPTO_BACKEND" == "nettle" ]; then
 
 PKG_CONFIG_PATH="$PACKAGE_ROOT/lib/pkgconfig" \
 OPTS="-ffunction-sections -fdata-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99 -I$PACKAGE_ROOT/include -I$TOP/e2fsprogs/lib -I$TOP/nettle/include" \
