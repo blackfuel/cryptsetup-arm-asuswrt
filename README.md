@@ -31,12 +31,13 @@ cd ~/cryptsetup-arm-asuswrt
 # then copy it to the router and run this script
 losetup /dev/loop6 ./vctest.img
 modprobe algif_skcipher  # you'll need my kernel patch (see above)
-cryptsetup --veracrypt tcryptOpen /dev/loop6 vctest
+modprobe sha512_generic  # you'll need my kernel patch (see above)
+cryptsetup -v --veracrypt tcryptOpen /dev/loop6 vctest
 # now wait 5 minutes; yes, it takes a very long time
 mkdir /mnt/vctest
 mount /dev/mapper/vctest /mnt/vctest
 # now copy some files that you want encrypted, to the /mnt/vctest folder
 umount /mnt/vctest
-cryptsetup tcryptClose vctest
+cryptsetup -v tcryptClose vctest
 losetup -d /dev/loop6
 ```
