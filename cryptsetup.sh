@@ -209,9 +209,10 @@ fi
 ############## ##############################################################
 
 # select the crypto backend for cryptsetup
-CRYPTO_BACKEND="gcrypt"
+#CRYPTO_BACKEND="gcrypt"
 #CRYPTO_BACKEND="openssl_asuswrt"
 #CRYPTO_BACKEND="nettle_asuswrt"
+CRYPTO_BACKEND="kernel"
 
 mkdir -p $SRC/cryptsetup && cd $SRC/cryptsetup
 DL="cryptsetup-1.7.4.tar.xz"
@@ -288,8 +289,26 @@ LIBS="-lpthread -lgpg-error -luuid -ldl -lnettle -L$PACKAGE_ROOT/lib -L$TOP/e2fs
 --disable-rpath \
 --enable-cryptsetup-reencrypt \
 --with-crypto_backend=nettle \
---enable-static-cryptsetup \
---with-libgcrypt-prefix=$PACKAGE_ROOT
+--enable-static-cryptsetup
+
+elif [ "$CRYPTO_BACKEND" == "kernel" ]; then
+
+PKG_CONFIG_PATH="$PACKAGE_ROOT/lib/pkgconfig" \
+OPTS="-ffunction-sections -fdata-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99 -I$PACKAGE_ROOT/include -I$TOP/e2fsprogs/lib" \
+CFLAGS="$OPTS" CPPFLAGS="$OPTS" \
+LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -L$PACKAGE_ROOT/lib -L$TOP/e2fsprogs/lib" \
+LIBS="-lpthread -lgpg-error -luuid -ldl -L$PACKAGE_ROOT/lib -L$TOP/e2fsprogs/lib" \
+./configure \
+--host=arm-brcm-linux-uclibcgnueabi \
+'--build=' \
+--prefix=$PACKAGE_ROOT \
+--enable-shared \
+--enable-static \
+--disable-nls \
+--disable-rpath \
+--enable-cryptsetup-reencrypt \
+--with-crypto_backend=kernel \
+--enable-static-cryptsetup
 
 fi
 
@@ -297,4 +316,3 @@ $MAKE
 make install
 touch __package_installed
 fi
-
