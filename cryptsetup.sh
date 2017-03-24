@@ -211,10 +211,10 @@ fi
 
 if [ -z "$CRYPTO_BACKEND" ]; then
   # select the crypto backend for cryptsetup
-  #CRYPTO_BACKEND="gcrypt"
+  CRYPTO_BACKEND="gcrypt"
   #CRYPTO_BACKEND="openssl"
   #CRYPTO_BACKEND="nettle"
-  CRYPTO_BACKEND="kernel"
+  #CRYPTO_BACKEND="kernel"
 fi
 
 mkdir -p "$SRC/cryptsetup" && cd "$SRC/cryptsetup"
@@ -321,3 +321,16 @@ $MAKE
 make install
 touch __package_installed
 fi
+
+########### #################################################################
+# ASUSWRT # #################################################################
+########### #################################################################
+
+# apply Linux kernel patch to support the full kernel cryptoAPI
+pushd .
+cd $ASUSWRT_MERLIN
+PATCH_NAME="${PATH_CMD%/*}/asuswrt_arm_dm-crypt+skcipher.patch"
+patch --dry-run --silent -p2 -i "$PATCH_NAME" >/dev/null 2>&1 && \
+  patch -p2 -i "$PATCH_NAME" || \
+  echo "The Linux kernel patch was not applied."
+popd
