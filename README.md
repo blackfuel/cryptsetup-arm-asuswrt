@@ -30,8 +30,16 @@ cd ~/cryptsetup-arm-asuswrt
 # first, use Veracrypt to create an encrypted file container named "vctest.img"
 # then copy it to the router and run this script
 losetup /dev/loop6 ./vctest.img
-modprobe algif_skcipher  # you'll need my kernel patch (see above)
-modprobe sha512_generic  # you'll need my kernel patch (see above)
+
+# you'll need my kernel patch (see above)
+modprobe dm-mod
+modprobe dm-crypt
+modprobe gf128mul
+modprobe xts
+modprobe sha256_generic
+modprobe sha512_generic  
+modprobe algif_skcipher
+
 cryptsetup -v --veracrypt tcryptOpen /dev/loop6 vctest
 # now wait 5 minutes; yes, it takes a very long time
 mkdir /mnt/vctest
