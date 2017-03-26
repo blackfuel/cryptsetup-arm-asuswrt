@@ -1,6 +1,6 @@
 # cryptsetup-arm-asuswrt
 
-It's possible to mount a Veracrypt or Truecrypt formatted device on your Asus ARM router.  However, a custom firmware is necessary.  As of March 20, 2017, all Asus ARM routers use Linux kernel 2.6.36.4. Therefore, a backport from Linux 2.6.38.8 to include the `algif_skcipher` kernel module and the user-space socket interface to the kernel crypto algorithms is needed.  
+It's possible to mount a Veracrypt or Truecrypt formatted device on your Asus ARM router.  However, a custom firmware is necessary.  As of March 20, 2017, all Asus ARM routers use Linux kernel 2.6.36.4. Therefore, a backport from Linux 2.6.38.8 to include the `algif_skcipher` kernel module and the user-space interface to the kernel cryptoAPI, is needed.  
 
 The `cryptsetup` program must also be compiled without `--disable-kernel_crypto`.  I found that the choice of crypto backend, for `cryptsetup`, makes a very big difference in the time to initially unlock a file container or device.  *Nettle* seems to be the fastest at 90 seconds on my RT-AC68U overclocked to 1200 MHz.  The crypto backends *gcrypt* and *openssl* take more than 4 minutes each.
 
