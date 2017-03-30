@@ -217,11 +217,11 @@ if [ -z "$CRYPTO_BACKEND" ]; then
   #CRYPTO_BACKEND="kernel"
 fi
 
-mkdir -p "$SRC/cryptsetup" && cd "$SRC/cryptsetup"
 DL="cryptsetup-1.7.4.tar.xz"
+URL="https://www.kernel.org/pub/linux/utils/cryptsetup/v1.7/$DL"
+mkdir -p "$SRC/cryptsetup" && cd "$SRC/cryptsetup"
 FOLDER="${DL%.tar.xz*}"
 FOLDER_CRYPTO="${FOLDER}-${CRYPTO_BACKEND}"
-URL="https://www.kernel.org/pub/linux/utils/cryptsetup/v1.7/$DL"
 [ "$REBUILD_ALL" == "1" ] && rm -rf "$FOLDER_CRYPTO"
 if [ ! -f "$FOLDER_CRYPTO/__package_installed" ]; then
 [ ! -f "$DL" ] && wget $URL
