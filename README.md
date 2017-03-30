@@ -6,23 +6,18 @@ The `cryptsetup` program must also be compiled without `--disable-kernel_crypto`
 
 Once the file container or device has been unlocked, after typing the correct password, the encryption/decryption speed is very good.
 
-### Clone the project and let's begin.
+### HOWTO: Compile Cryptsetup with support for Veracrypt/Truecrypt
 ```
 cd
 git clone https://github.com/blackfuel/cryptsetup-arm-asuswrt.git
 cd cryptsetup-arm-asuswrt
+./cryptsetup.sh
 ```
 
-### HOWTO: Patch AsusWRT kernel to enable dm-crypt, hashes, ciphers, and the user-space socket interface to the algorithms for symmetric key cipher
+### HOWTO: Patch AsusWRT to enable dm-crypt and the Linux kernel cryptoAPI
 ```
 cd ~/asuswrt-merlin
 patch -p2 -i ~/cryptsetup-arm-asuswrt/asuswrt_arm_dm-crypt+skcipher.patch
-```
-
-### HOWTO: Compile Cryptsetup with support for Veracrypt/Truecrypt
-```
-cd ~/cryptsetup-arm-asuswrt
-./cryptsetup.sh
 ```
 
 ### Example: An encrypted file container, created on Microsoft Windows using Veracrypt, may now be opened on your Asus ARM router.
