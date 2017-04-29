@@ -224,7 +224,7 @@ if [ -z "$CRYPTO_BACKEND" ]; then
   #CRYPTO_BACKEND="kernel"
 fi
 
-DL="cryptsetup-1.7.4.tar.xz"
+DL="cryptsetup-1.7.5.tar.xz"
 URL="https://www.kernel.org/pub/linux/utils/cryptsetup/v1.7/$DL"
 mkdir -p "$SRC/cryptsetup" && cd "$SRC/cryptsetup"
 FOLDER="${DL%.tar.xz*}"
