@@ -130,9 +130,14 @@ LIBS="-lm -lncursesw -L$TOP/ncurses/lib -L$SYSROOT/usr/lib" \
 --enable-shared \
 --enable-static \
 --disable-rpath \
---disable-silent-rules --disable-makeinstall-chown --disable-makeinstall-setuid --with-sysroot=$SYSROOT \
+--disable-silent-rules \
+--disable-bash-completion \
+--disable-makeinstall-chown \
+--disable-makeinstall-setuid \
+--with-sysroot=$SYSROOT \
 --disable-agetty \
---without-ncurses --without-ncursesw
+--without-ncurses \
+--without-ncursesw
 
 $MAKE
 make install
