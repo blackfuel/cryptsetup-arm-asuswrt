@@ -78,7 +78,9 @@ if [ ! -f "$FOLDER/__package_installed" ]; then
 cd $FOLDER
 
 PATCH_NAME="${PATH_CMD%/*}/libgpg-error_mkheader_brcmarm.patch"
-patch -p2 -i "$PATCH_NAME"
+patch --dry-run --silent -p1 -i "$PATCH_NAME" >/dev/null 2>&1 && \
+  patch -p1 -i "$PATCH_NAME" || \
+  echo "The patch was not applied."
 
 PKG_CONFIG_PATH="$PACKAGE_ROOT/lib/pkgconfig" \
 OPTS="-ffunction-sections -fdata-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99" \
@@ -148,7 +150,7 @@ fi
 # LVM2 # ####################################################################
 ######## ####################################################################
 
-DL="LVM2.2.02.168.tgz"
+DL="LVM2.2.02.170.tgz"
 URL="ftp://sources.redhat.com/pub/lvm2/releases/$DL"
 mkdir -p $SRC/lvm2 && cd $SRC/lvm2
 FOLDER="${DL%.tgz*}"
@@ -158,11 +160,19 @@ if [ ! -f "$FOLDER/__package_installed" ]; then
 [ ! -d "$FOLDER" ] && tar xzvf $DL
 cd $FOLDER
 
+if [ "$DL" == "LVM2.2.02.169.tgz" ] ||
+   [ "$DL" == "LVM2.2.02.170.tgz" ]; then
+PATCH_NAME="${PATH_CMD%/*}/lvm2-libdm-size-fix.patch"
+patch --dry-run --silent -p1 -i "$PATCH_NAME" >/dev/null 2>&1 && \
+  patch -p1 -i "$PATCH_NAME" || \
+  echo "The patch was not applied."
+fi
+
 PKG_CONFIG_PATH="$PACKAGE_ROOT/lib/pkgconfig" \
 OPTS="-ffunction-sections -fdata-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99 -I$PACKAGE_ROOT/include" \
 CFLAGS="$OPTS" CXXFLAGS="$OPTS" CPPFLAGS="$OPTS" \
-LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections  -L$PACKAGE_ROOT/lib -L../libdm/ioctl" \
-LIBS="-lpthread -luuid -lm  -L$PACKAGE_ROOT/lib -L../libdm/ioctl" \
+LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -L../libdm/ioctl -L$PACKAGE_ROOT/lib" \
+LIBS="-lpthread -luuid -lm -L../libdm/ioctl -L$PACKAGE_ROOT/lib" \
 ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes \
 ./configure \
 --host=arm-brcm-linux-uclibcgnueabi \
