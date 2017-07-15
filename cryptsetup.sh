@@ -150,8 +150,8 @@ fi
 # LVM2 # ####################################################################
 ######## ####################################################################
 
-DL="LVM2.2.02.170.tgz"
-URL="ftp://sources.redhat.com/pub/lvm2/releases/$DL"
+DL="LVM2.2.02.172.tgz"
+URL="https://mirrors.kernel.org/sourceware/lvm2/$DL"
 mkdir -p $SRC/lvm2 && cd $SRC/lvm2
 FOLDER="${DL%.tgz*}"
 [ "$REBUILD_ALL" == "1" ] && rm -rf "$FOLDER"
@@ -161,7 +161,8 @@ if [ ! -f "$FOLDER/__package_installed" ]; then
 cd $FOLDER
 
 if [ "$DL" == "LVM2.2.02.169.tgz" ] ||
-   [ "$DL" == "LVM2.2.02.170.tgz" ]; then
+   [ "$DL" == "LVM2.2.02.170.tgz" ] ||
+   [ "$DL" == "LVM2.2.02.172.tgz" ]; then
 PATCH_NAME="${PATH_CMD%/*}/lvm2-libdm-size-fix.patch"
 patch --dry-run --silent -p1 -i "$PATCH_NAME" >/dev/null 2>&1 && \
   patch -p1 -i "$PATCH_NAME" || \
@@ -199,7 +200,7 @@ fi
 # GCRYPT # ##################################################################
 ########## ##################################################################
 
-DL="libgcrypt-1.7.7.tar.bz2"
+DL="libgcrypt-1.7.8.tar.bz2"
 URL="https://gnupg.org/ftp/gcrypt/libgcrypt/$DL"
 mkdir -p $SRC/gcrypt && cd $SRC/gcrypt
 FOLDER="${DL%.tar.bz2*}"
