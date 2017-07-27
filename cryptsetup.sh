@@ -104,8 +104,10 @@ fi
 # UTIL-LINUX # ##############################################################
 ############## ##############################################################
 
-DL="util-linux-2.29.2.tar.xz"
-URL="https://www.kernel.org/pub/linux/utils/util-linux/v2.29/$DL"
+#DL="util-linux-2.29.2.tar.xz"
+#URL="https://www.kernel.org/pub/linux/utils/util-linux/v2.29/$DL"
+DL="util-linux-2.30.1.tar.xz"
+URL="https://www.kernel.org/pub/linux/utils/util-linux/v2.30/$DL"
 mkdir -p $SRC/util-linux && cd $SRC/util-linux
 FOLDER="${DL%.tar.xz*}"
 [ "$REBUILD_ALL" == "1" ] && rm -rf "$FOLDER"
@@ -119,6 +121,15 @@ cd $TOP/ncurses/lib
 [ ! -f libtinfo.so.6 ] && ln -sf libncursesw.so.6 libtinfo.so.6
 [ ! -f libtinfo.so ] && ln -sf libtinfo.so.6 libtinfo.so
 popd
+
+if [ "$DL" == "util-linux-2.30.tar.xz" ] ||
+   [ "$DL" == "util-linux-2.30.1.tar.xz" ]; then
+# util-linux/sys-utils: posix_fallocate support is not compiled
+PATCH_NAME="${PATH_CMD%/*}/util-linux_sys-utils_no-posix-fallocate.patch"
+patch --dry-run --silent -p1 -i "$PATCH_NAME" >/dev/null 2>&1 && \
+  patch -p1 -i "$PATCH_NAME" || \
+  echo "The patch was not applied."
+fi
 
 PKG_CONFIG_PATH="$PACKAGE_ROOT/lib/pkgconfig" \
 OPTS="-ffunction-sections -fno-data-sections -O3 -pipe -march=armv7-a -mtune=cortex-a9 -fno-caller-saves -mfloat-abi=soft -Wall -fPIC -std=gnu99 -I$TOP/ncurses/include -I$SYSROOT/usr/include -lm" \
@@ -150,7 +161,7 @@ fi
 # LVM2 # ####################################################################
 ######## ####################################################################
 
-DL="LVM2.2.02.172.tgz"
+DL="LVM2.2.02.173.tgz"
 URL="https://mirrors.kernel.org/sourceware/lvm2/$DL"
 mkdir -p $SRC/lvm2 && cd $SRC/lvm2
 FOLDER="${DL%.tgz*}"
@@ -162,7 +173,8 @@ cd $FOLDER
 
 if [ "$DL" == "LVM2.2.02.169.tgz" ] ||
    [ "$DL" == "LVM2.2.02.170.tgz" ] ||
-   [ "$DL" == "LVM2.2.02.172.tgz" ]; then
+   [ "$DL" == "LVM2.2.02.172.tgz" ] ||
+   [ "$DL" == "LVM2.2.02.173.tgz" ]; then
 PATCH_NAME="${PATH_CMD%/*}/lvm2-libdm-size-fix.patch"
 patch --dry-run --silent -p1 -i "$PATCH_NAME" >/dev/null 2>&1 && \
   patch -p1 -i "$PATCH_NAME" || \
@@ -200,7 +212,7 @@ fi
 # GCRYPT # ##################################################################
 ########## ##################################################################
 
-DL="libgcrypt-1.7.8.tar.bz2"
+DL="libgcrypt-1.8.0.tar.bz2"
 URL="https://gnupg.org/ftp/gcrypt/libgcrypt/$DL"
 mkdir -p $SRC/gcrypt && cd $SRC/gcrypt
 FOLDER="${DL%.tar.bz2*}"
