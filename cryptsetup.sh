@@ -174,7 +174,8 @@ cd $FOLDER
 if [ "$DL" == "LVM2.2.02.169.tgz" ] ||
    [ "$DL" == "LVM2.2.02.170.tgz" ] ||
    [ "$DL" == "LVM2.2.02.172.tgz" ] ||
-   [ "$DL" == "LVM2.2.02.173.tgz" ]; then
+   [ "$DL" == "LVM2.2.02.173.tgz" ] ||
+   [ "$DL" == "LVM2.2.02.174.tgz" ]; then
 PATCH_NAME="${PATH_CMD%/*}/lvm2-libdm-size-fix.patch"
 patch --dry-run --silent -p1 -i "$PATCH_NAME" >/dev/null 2>&1 && \
   patch -p1 -i "$PATCH_NAME" || \
@@ -212,7 +213,7 @@ fi
 # GCRYPT # ##################################################################
 ########## ##################################################################
 
-DL="libgcrypt-1.8.0.tar.bz2"
+DL="libgcrypt-1.8.1.tar.bz2"
 URL="https://gnupg.org/ftp/gcrypt/libgcrypt/$DL"
 mkdir -p $SRC/gcrypt && cd $SRC/gcrypt
 FOLDER="${DL%.tar.bz2*}"
